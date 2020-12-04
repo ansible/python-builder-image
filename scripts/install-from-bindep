@@ -16,12 +16,10 @@
 
 set -ex
 
-PKGMGR=dnf
-
-${PKGMGR} update -y
+dnf update -y
 PACKAGES=$(cat /output/bindep/run.txt)
 if [ ! -z "$PACKAGES" ]; then
-    ${PKGMGR} install -y $PACKAGES
+    dnf install -y $PACKAGES
 fi
 
 # If there's a constraints file, use it.
@@ -56,5 +54,5 @@ else
 fi
 
 # clean up after ourselves
-${PKGMGR} clean all
-rm -rf /var/cache/${PKGMGR}
+dnf clean all
+rm -rf /var/cache/dnf
