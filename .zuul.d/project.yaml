@@ -3,9 +3,11 @@
     check:
       jobs:
         - python-builder-build-container-image
+        - python-builder-test-container-image
     gate:
       jobs:
         - python-builder-build-container-image
+        - python-builder-test-container-image
     post:
       jobs:
         - python-builder-upload-container-image:
