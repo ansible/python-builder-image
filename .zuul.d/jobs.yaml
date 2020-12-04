@@ -16,6 +16,21 @@
             "{{ zuul.tag is defined | ternary([zuul.get('tag', '').split('.')[0], '.'.join(zuul.get('tag', '').split('.')[:2]), zuul.get('tag', '')], ['latest']) }}"
       docker_images: *container_images
 
+
+- job:
+    name: python-builder-test-container-image
+    parent: ansible-build-container-image
+    description: Test python-builder container image
+    dependencies:
+      - python-builder-build-container-image
+    requires: python-builder-container-image
+    vars:
+      container_images:
+        - context: example
+          container_filename: Containerfile
+          registry: quay.io
+          repository: quay.io/example/example
+
 - job:
     name: python-builder-upload-container-image
     parent: ansible-upload-container-image
