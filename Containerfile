@@ -15,6 +15,11 @@
 
 FROM docker.io/centos:8
 
+# NOTE(pabelanger): Until centos 8.3 container images is published to
+# docker.io/centos:8 we need to exclude filesystem from updating. See
+# https://bugs.centos.org/view.php?id=17915
+RUN echo -n "exclude=filesystem" >> /etc/dnf/dnf.conf
+
 RUN dnf update -y \
   && dnf install -y python3-pip python3-wheel \
   && dnf clean all \
