@@ -20,6 +20,10 @@ RUN dnf update -y \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
+# Upgrade pip to fix wheel cache for locally built wheels.
+# See https://github.com/pypa/pip/issues/6852
+RUN pip3 install -U pip
+
 RUN pip3 install --no-cache-dir bindep
 
 COPY scripts/assemble /usr/local/bin/assemble
