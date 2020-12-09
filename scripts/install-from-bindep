@@ -22,6 +22,11 @@ if [ ! -z "$PACKAGES" ]; then
     dnf install -y $PACKAGES
 fi
 
+EPEL_PACKAGES=$(cat /output/bindep/epel.txt)
+if [ ! -z "$EPEL_PACKAGES" ]; then
+    dnf install -y --enablerepo epel $EPEL_PACKAGES
+fi
+
 # If there's a constraints file, use it.
 if [ -f /output/upper-constraints.txt ] ; then
     CONSTRAINTS="-c /output/upper-constraints.txt"

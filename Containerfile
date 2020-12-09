@@ -16,6 +16,8 @@
 FROM quay.io/centos/centos:8
 
 RUN dnf update -y \
+  && dnf install -y epel-release dnf-plugins-core \
+  && dnf config-manager --set-disabled epel \
   && dnf install -y python3-pip python3-wheel \
   && dnf clean all \
   && rm -rf /var/cache/dnf

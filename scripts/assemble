@@ -32,7 +32,10 @@ function install_bindep {
     # to produce a wheel.  Note we append because we want all
     # sibling packages in here too
     if [ -f bindep.txt ] ; then
-        bindep -l newline >> /output/bindep/run.txt || true
+        bindep -l newline | sort >> /output/bindep/run.txt || true
+        bindep -l newline -b epel | sort >> /output/bindep/stage.txt || true
+        grep -Fxvf /output/bindep/run.txt /output/bindep/stage.txt >> /output/bindep/epel.txt || true
+        rm -rf /output/bindep/stage.txt
         compile_packages=$(bindep -b compile || true)
         if [ ! -z "$compile_packages" ] ; then
             dnf install -y ${compile_packages}
