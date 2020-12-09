@@ -31,7 +31,7 @@ function install_bindep {
     # Protect from the bindep builder image use of the assemble script
     # to produce a wheel.  Note we append because we want all
     # sibling packages in here too
-    if [ -f bindep.txt -o -f other-requirements.txt ] ; then
+    if [ -f bindep.txt ] ; then
         bindep -l newline >> /output/bindep/run.txt || true
         compile_packages=$(bindep -b compile || true)
         if [ ! -z "$compile_packages" ] ; then
