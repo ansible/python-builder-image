@@ -24,7 +24,7 @@ RUN dnf update -y \
 
 # Upgrade pip to fix wheel cache for locally built wheels.
 # See https://github.com/pypa/pip/issues/6852
-RUN pip3 install -U pip
+RUN pip3 install --no-cache-dir -U pip
 
 RUN pip3 install --no-cache-dir bindep
 
