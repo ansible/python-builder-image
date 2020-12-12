@@ -4,6 +4,7 @@
     parent: ansible-build-container-image
     description: Build python-builder container image
     provides: python-builder-container-image
+    requires: python-base-container-image
     vars: &vars
       container_images: &container_images
         - context: .
@@ -37,4 +38,5 @@
     description: Build python-builder container image and upload to quay.io
     timeout: 2700
     provides: python-builder-container-image
+    requires: python-base-container-image
     vars: *vars
