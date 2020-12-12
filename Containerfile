@@ -13,18 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM quay.io/centos/centos:8
+FROM quay.io/ansible/python-base:latest
+# =============================================================================
 
 RUN dnf update -y \
-  && dnf install -y epel-release dnf-plugins-core \
-  && dnf config-manager --set-disabled epel \
-  && dnf install -y python3-pip python3-wheel \
+  && dnf install -y python3-wheel \
   && dnf clean all \
   && rm -rf /var/cache/dnf
-
-# Upgrade pip to fix wheel cache for locally built wheels.
-# See https://github.com/pypa/pip/issues/6852
-RUN pip3 install --no-cache-dir -U pip
 
 RUN pip3 install --no-cache-dir bindep
 
