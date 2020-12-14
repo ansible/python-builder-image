@@ -58,7 +58,7 @@ else
   # NOTE(pabelanger): It is possible a project may not have a wheel, but does have requirements.txt
   if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
       pip3 install $CONSTRAINTS --force --cache-dir=/output/wheels /output/wheels/*.whl $EXTRAS
-  else
+  elif [ ! -z "$EXTRAS" ] ; then
       pip3 install $CONSTRAINTS --force --cache-dir=/output/wheels $EXTRAS
   fi
 fi
