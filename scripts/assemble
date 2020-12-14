@@ -46,7 +46,7 @@ function install_bindep {
 function install_wheels {
     # Build a wheel so that we have an install target.
     # pip install . in the container context with the mounted
-    # source dir gets ... exciting.
+    # source dir gets ... exciting, if setup.py exists.
     # We run sdist first to trigger code generation steps such
     # as are found in zuul, since the sequencing otherwise
     # happens in a way that makes wheel content copying unhappy.
@@ -54,7 +54,9 @@ function install_wheels {
     # in the output dir and not the wheel cache, so it's not
     # possible to tell what is the wheel for the project and
     # what is the wheel cache.
-    python3 setup.py sdist bdist_wheel -d /output/wheels
+    if [ -f setup.py ] ; then
+        python3 setup.py sdist bdist_wheel -d /output/wheels
+    fi
 
     # Install everything so that the wheel cache is populated with
     # transitive depends. If a requirements.txt file exists, install
@@ -66,7 +68,10 @@ function install_wheels {
         /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels -r /tmp/src/requirements.txt
         cp /tmp/src/requirements.txt /output/requirements.txt
     fi
-    /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*whl
+    # If we didn't build wheels, we can skip trying to install it.
+    if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
+        /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*whl
+    fi
 
     # Install each of the extras so that we collect all possibly
     # needed wheels in the wheel cache. get-extras-packages also
