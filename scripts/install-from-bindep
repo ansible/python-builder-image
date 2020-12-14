@@ -17,14 +17,19 @@
 set -ex
 
 dnf update -y
-PACKAGES=$(cat /output/bindep/run.txt)
-if [ ! -z "$PACKAGES" ]; then
-    dnf install -y $PACKAGES
+
+if [ -f /output/bindep/run.txt ] ; then
+    PACKAGES=$(cat /output/bindep/run.txt)
+    if [ ! -z "$PACKAGES" ]; then
+        dnf install -y $PACKAGES
+    fi
 fi
 
-EPEL_PACKAGES=$(cat /output/bindep/epel.txt)
-if [ ! -z "$EPEL_PACKAGES" ]; then
-    dnf install -y --enablerepo epel $EPEL_PACKAGES
+if [ -f /output/bindep/epel.txt ] ; then
+    EPEL_PACKAGES=$(cat /output/bindep/epel.txt)
+    if [ ! -z "$EPEL_PACKAGES" ]; then
+        dnf install -y --enablerepo epel $EPEL_PACKAGES
+    fi
 fi
 
 # If there's a constraints file, use it.
