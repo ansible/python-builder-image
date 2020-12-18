@@ -55,7 +55,7 @@ function install_wheels {
     # possible to tell what is the wheel for the project and
     # what is the wheel cache.
     if [ -f setup.py ] ; then
-        python3 setup.py sdist bdist_wheel -d /output/wheels
+        python3.8 setup.py sdist bdist_wheel -d /output/wheels
     fi
 
     # Install everything so that the wheel cache is populated with
@@ -95,7 +95,7 @@ done
 
 # Use a clean virtualenv for install steps to prevent things from the
 # current environment making us not build a wheel.
-python3 -m venv /tmp/venv
+python3.8 -m venv /tmp/venv
 /tmp/venv/bin/pip install -U pip wheel
 
 # If there is an upper-constraints.txt file in the source tree,
