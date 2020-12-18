@@ -17,6 +17,7 @@ FROM quay.io/ansible/python-base:latest
 # =============================================================================
 
 RUN dnf update -y \
+  && dnf config-manager --set-enabled powertools \
   && dnf install -y python38-wheel \
   && dnf clean all \
   && rm -rf /var/cache/dnf
