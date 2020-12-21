@@ -56,15 +56,17 @@ if [ -f /output/packages.txt ] ; then
   # image.
   pip3 install $CONSTRAINTS --cache-dir=/output/wheels -r /output/packages.txt $EXTRAS
 else
-  # Install the wheels.  Use --force here because sibling wheels might
+  # Install the wheels. Uninstall any existing version as siblings maybe
   # be built with the same version number as the latest release, but we
   # really want the speculatively built wheels installed over any
   # automatic dependencies.
   # NOTE(pabelanger): It is possible a project may not have a wheel, but does have requirements.txt
   if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
-      pip3 install $CONSTRAINTS --force --cache-dir=/output/wheels /output/wheels/*.whl $EXTRAS
+      pip3 uninstall -y /output/wheels/*.whl
+      pip3 install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*.whl $EXTRAS
   elif [ ! -z "$EXTRAS" ] ; then
-      pip3 install $CONSTRAINTS --force --cache-dir=/output/wheels $EXTRAS
+      pip3 uninstall -y $EXTRAS
+      pip3 install $CONSTRAINTS --cache-dir=/output/wheels $EXTRAS
   fi
 fi
 
