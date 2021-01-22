@@ -117,10 +117,6 @@ if [[ $PACKAGES ]] ; then
       echo "$package" >> /output/packages.txt
     done
 else
-    # pbr needs git installed, else nothing will work. Do this in between
-    # bindep and wheel so that we don't miss git in target images.
-    dnf install -y git
-
     install_wheels
 fi
 
