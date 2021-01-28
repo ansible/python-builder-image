@@ -13,10 +13,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM quay.io/ansible/python-builder:latest
+ARG PYTHON_BUILDER_IMAGE=quay.io/ansible/python-builder:latest
+
+FROM $PYTHON_BUILDER_IMAGE
+ARG PYTHON_BUILDER_IMAGE
 
 COPY . /tmp/src
 RUN assemble
 
 RUN vim --version
-RUN svn --version
+RUN if [[ "$PYTHON_BUILDER_IMAGE" =~ "latest" ]] ; then \
+    svn --version ; \
+  fi

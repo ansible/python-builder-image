@@ -13,7 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-FROM quay.io/ansible/python-base:latest
+ARG CONTAINER_IMAGE=quay.io/ansible/python-base:latest
+
+FROM $CONTAINER_IMAGE
 # =============================================================================
 
 RUN dnf update -y \
