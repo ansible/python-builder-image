@@ -14,17 +14,26 @@
 # limitations under the License.
 
 ARG CONTAINER_IMAGE=quay.io/ansible/python-base:latest
+ARG REMOTE_SOURCE=.
+ARG REMOTE_SOURCE_DIR=/remote-source
 
 FROM $CONTAINER_IMAGE
 # =============================================================================
+ARG REMOTE_SOURCE_DIR
+
+COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
+WORKDIR $REMOTE_SOURCE_DIR/app
 
 RUN dnf update -y \
   && dnf install -y python38-wheel git \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
-RUN pip3 install --no-cache-dir bindep
+RUN pip3 install --no-cache-dir bindep -c constraints.txt
 
 COPY scripts/assemble /usr/local/bin/assemble
 COPY scripts/get-extras-packages /usr/local/bin/get-extras-packages
 COPY scripts/install-from-bindep /output/install-from-bindep
+
+WORKDIR /
+RUN rm -rf $REMOTE_SOURCE_DIR
