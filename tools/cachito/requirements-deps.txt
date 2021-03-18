@@ -1,0 +1,4 @@
+# NOTE(pabelanger) transient dependencies that cachito needs to know about.
+distro
+Parsley
+pbr

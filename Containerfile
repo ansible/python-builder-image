@@ -16,24 +16,33 @@
 ARG CONTAINER_IMAGE=quay.io/ansible/python-base:latest
 ARG REMOTE_SOURCE=.
 ARG REMOTE_SOURCE_DIR=/remote-source
+ARG REMOTE_SOURCE_APP_DIR=$REMOTE_SOURCE_DIR
+
+FROM $CONTAINER_IMAGE as builder
+# =============================================================================
+ARG REMOTE_SOURCE_DIR
+COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
 
 FROM $CONTAINER_IMAGE
 # =============================================================================
-ARG REMOTE_SOURCE_DIR
+ARG REMOTE_SOURCE_APP_DIR
 
-COPY $REMOTE_SOURCE $REMOTE_SOURCE_DIR
-WORKDIR $REMOTE_SOURCE_DIR/app
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/constraints.txt $REMOTE_SOURCE_APP_DIR/constraints.txt
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/requirements.txt $REMOTE_SOURCE_APP_DIR/requirements.txt
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/assemble /usr/local/bin/assemble
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/get-extras-packages /usr/local/bin/get-extras-packages
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/install-from-bindep /output/install-from-bindep
+
+RUN ls -la $REMOTE_SOURCE_APP_DIR
+
+WORKDIR $REMOTE_SOURCE_APP_DIR
 
 RUN dnf update -y \
   && dnf install -y python38-wheel git \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
-RUN pip3 install --no-cache-dir bindep -c constraints.txt
-
-COPY scripts/assemble /usr/local/bin/assemble
-COPY scripts/get-extras-packages /usr/local/bin/get-extras-packages
-COPY scripts/install-from-bindep /output/install-from-bindep
+RUN pip3 install --no-cache-dir -r requirements.txt -c constraints.txt
 
 WORKDIR /
-RUN rm -rf $REMOTE_SOURCE_DIR
+RUN rm -rf $REMOTE_SOURCE_APP_DIR
