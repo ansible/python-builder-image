@@ -33,8 +33,6 @@ COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/assemble /usr/local/bin/assem
 COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/get-extras-packages /usr/local/bin/get-extras-packages
 COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/install-from-bindep /output/install-from-bindep
 
-RUN ls -la $REMOTE_SOURCE_APP_DIR
-
 WORKDIR $REMOTE_SOURCE_APP_DIR
 
 RUN dnf update -y \
