@@ -3,28 +3,18 @@
     check:
       jobs:
         - python-builder-build-container-image
-        - python-builder-build-ubi8-container-image
         - python-builder-test-container-image
-        - python-builder-test-ubi8-container-image
     gate:
       jobs:
         - python-builder-build-container-image
-        - python-builder-build-ubi8-container-image
         - python-builder-test-container-image
-        - python-builder-test-ubi8-container-image
     post:
       jobs:
         - python-builder-upload-container-image:
             vars:
               upload_container_image_promote: false
-        - python-builder-upload-ubi8-container-image:
-            vars:
-              upload_container_image_promote: false
     periodic:
       jobs:
         - python-builder-upload-container-image:
-            vars:
-              upload_container_image_promote: false
-        - python-builder-upload-ubi8-container-image:
             vars:
               upload_container_image_promote: false
