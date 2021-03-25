@@ -103,8 +103,7 @@ done
 # NOTE(pabelanger): We allow users to install distro python packages of
 # libraries. This is important for projects that eventually want to produce
 # an RPM or offline install.
-python3.8 -m venv /tmp/venv --system-site-packages
-/tmp/venv/bin/pip install -U pip wheel
+python3.8 -m venv /tmp/venv --system-site-packages --without-pip
 
 # If there is an upper-constraints.txt file in the source tree,
 # use it in the pip commands.
