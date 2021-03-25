@@ -69,20 +69,20 @@ function install_wheels {
     # Only do this for the main package (i.e. only write requirements
     # once).
     if [ -f /tmp/src/requirements.txt ] && [ ! -f /output/requirements.txt ] ; then
-        /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels -r /tmp/src/requirements.txt
+        pip3 install $CONSTRAINTS --cache-dir=/output/wheels -r /tmp/src/requirements.txt
         cp /tmp/src/requirements.txt /output/requirements.txt
     fi
     # If we didn't build wheels, we can skip trying to install it.
     if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
-        /tmp/venv/bin/pip uninstall -y /output/wheels/*.whl
-        /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*whl
+        pip3 uninstall -y /output/wheels/*.whl
+        pip3 install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*whl
     fi
 
     # Install each of the extras so that we collect all possibly
     # needed wheels in the wheel cache. get-extras-packages also
     # writes out the req files into /output/$extra/requirements.txt.
     for req in $(get-extras-packages) ; do
-        /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels "$req"
+        pip3 install $CONSTRAINTS --cache-dir=/output/wheels "$req"
     done
 }
 
@@ -103,8 +103,8 @@ done
 # NOTE(pabelanger): We allow users to install distro python packages of
 # libraries. This is important for projects that eventually want to produce
 # an RPM or offline install.
-python3.8 -m venv /tmp/venv --system-site-packages
-/tmp/venv/bin/pip install -U pip wheel
+python3.8 -m venv /tmp/venv --system-site-packages --without-pip
+source /tmp/venv/bin/activate
 
 # If there is an upper-constraints.txt file in the source tree,
 # use it in the pip commands.
@@ -116,7 +116,7 @@ fi
 # If we got a list of packages, install them, otherwise install the
 # main package.
 if [[ $PACKAGES ]] ; then
-    /tmp/venv/bin/pip install $CONSTRAINTS --cache-dir=/output/wheels $PACKAGES
+    pip3 install $CONSTRAINTS --cache-dir=/output/wheels $PACKAGES
     for package in $PACKAGES ; do
       echo "$package" >> /output/packages.txt
     done
