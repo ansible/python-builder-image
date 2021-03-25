@@ -18,23 +18,6 @@
       docker_images: *container_images
 
 - job:
-    name: python-builder-build-ubi8-container-image
-    parent: ansible-build-container-image
-    description: Build python-builder ubi8 container image
-    provides: python-builder-ubi8-container-image
-    requires: python-base-ubi8-container-image
-    vars: &vars_ubi8
-      container_images: &container_images_ubi8
-        - context: .
-          build_args:
-            - CONTAINER_IMAGE=registry.access.redhat.com/ubi8:latest
-          container_filename: Containerfile
-          registry: quay.io
-          repository: quay.io/ansible/python-builder
-          tags: ['ubi8']
-      docker_images: *container_images_ubi8
-
-- job:
     name: python-builder-test-container-image
     parent: ansible-build-container-image
     description: Test python-builder container image
@@ -49,22 +32,6 @@
           repository: quay.io/example/example
 
 - job:
-    name: python-builder-test-ubi8-container-image
-    parent: ansible-build-container-image
-    description: Test python-builder ubi8 container image
-    dependencies:
-      - python-builder-build-ubi8-container-image
-    requires: python-builder-ubi8-container-image
-    vars:
-      container_images:
-        - context: example
-          build_args:
-            - PYTHON_BUILDER_IMAGE=quay.io/ansible/python-builder:ubi8
-          container_filename: Containerfile
-          registry: quay.io
-          repository: quay.io/example/example
-
-- job:
     name: python-builder-upload-container-image
     parent: ansible-upload-container-image
     description: Build python-builder container image and upload to quay.io
@@ -72,12 +39,3 @@
     provides: python-builder-container-image
     requires: python-base-container-image
     vars: *vars
-
-- job:
-    name: python-builder-upload-ubi8-container-image
-    parent: ansible-upload-container-image
-    description: Build python-builder ubi8 container image and upload to quay.io
-    timeout: 2700
-    provides: python-builder-ubi8-container-image
-    requires: python-base-ubi8-container-image
-    vars: *vars_ubi8
