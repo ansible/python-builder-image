@@ -113,6 +113,13 @@ if [ -f /tmp/src/upper-constraints.txt ] ; then
     CONSTRAINTS="-c /tmp/src/upper-constraints.txt"
 fi
 
+# When using cachito, there is a use case where we first need to install build
+# requirements. These build requirements will not live in the final layer, so
+# allow users to place them into requirements-build.txt
+if [ -f /tmp/src/requirements-build.txt ] ; then
+    pip3 install $CONSTRAINTS --no-cache-dir -f /tmp/src/requirements-build.txt
+fi
+
 # If we got a list of packages, install them, otherwise install the
 # main package.
 if [[ $PACKAGES ]] ; then
