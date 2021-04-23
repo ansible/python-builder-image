@@ -69,24 +69,25 @@ function install_wheels {
     # Only do this for the main package (i.e. only write requirements
     # once).
     if [ -f /tmp/src/requirements.txt ] && [ ! -f /output/requirements.txt ] ; then
-        pip3 install $CONSTRAINTS --cache-dir=/output/wheels -r /tmp/src/requirements.txt
+        pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels -r /tmp/src/requirements.txt
         cp /tmp/src/requirements.txt /output/requirements.txt
     fi
     # If we didn't build wheels, we can skip trying to install it.
     if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
         pip3 uninstall -y /output/wheels/*.whl
-        pip3 install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*whl
+        pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels /output/wheels/*whl
     fi
 
     # Install each of the extras so that we collect all possibly
     # needed wheels in the wheel cache. get-extras-packages also
     # writes out the req files into /output/$extra/requirements.txt.
     for req in $(get-extras-packages) ; do
-        pip3 install $CONSTRAINTS --cache-dir=/output/wheels "$req"
+        pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels "$req"
     done
 }
 
 PACKAGES=$*
+PIP_OPTS="${PIP_OPTS-}"
 
 # bindep the main package
 install_bindep
@@ -116,7 +117,7 @@ fi
 # If we got a list of packages, install them, otherwise install the
 # main package.
 if [[ $PACKAGES ]] ; then
-    pip3 install $CONSTRAINTS --cache-dir=/output/wheels $PACKAGES
+    pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels $PACKAGES
     for package in $PACKAGES ; do
       echo "$package" >> /output/packages.txt
     done
