@@ -48,6 +48,12 @@ function install_bindep {
 }
 
 function install_wheels {
+    # NOTE(pabelanger): If there are build requirements to install, do so.
+    # However do not cache them as we do not want them in the final image.
+    if [ -f /tmp/src/build-requirements.txt ] && [ ! -f /tmp/src/.build-requirements.txt ] ; then
+        pip3 install $CONSTRAINTS $PIP_OPTS --no-cache -r /tmp/src/build-requirements.txt
+        touch /tmp/src/.build-requirements.txt
+    fi
     # Build a wheel so that we have an install target.
     # pip install . in the container context with the mounted
     # source dir gets ... exciting, if setup.py exists.
