@@ -27,7 +27,7 @@ FROM $CONTAINER_IMAGE
 # =============================================================================
 ARG REMOTE_SOURCE_APP_DIR
 
-COPY --from=builder $REMOTE_SOURCE_APP_DIR/constraints.txt $REMOTE_SOURCE_APP_DIR/constraints.txt
+COPY --from=builder $REMOTE_SOURCE_APP_DIR/build-requirements.txt $REMOTE_SOURCE_APP_DIR/build-requirements.txt
 COPY --from=builder $REMOTE_SOURCE_APP_DIR/requirements.txt $REMOTE_SOURCE_APP_DIR/requirements.txt
 COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/assemble /usr/local/bin/assemble
 COPY --from=builder $REMOTE_SOURCE_APP_DIR/scripts/get-extras-packages /usr/local/bin/get-extras-packages
@@ -40,7 +40,9 @@ RUN dnf update -y \
   && dnf clean all \
   && rm -rf /var/cache/dnf
 
-RUN pip3 install --no-cache-dir -r requirements.txt -c constraints.txt
+RUN cat build-requirements.txt requirements.txt | sort > upper-constraints.txt \
+  && pip3 install --no-cache-dir -r build-requirements.txt -c upper-constraints.txt \
+  && pip3 install --no-cache-dir -r requirements.txt -c upper-constraints.txt
 
 WORKDIR /
 RUN rm -rf $REMOTE_SOURCE_APP_DIR
