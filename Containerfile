@@ -38,7 +38,9 @@ WORKDIR $REMOTE_SOURCE_APP_DIR
 RUN dnf update -y \
   && dnf install -y python38-wheel git \
   && dnf clean all \
-  && rm -rf /var/cache/dnf
+  && rm -rf /var/cache/{dnf,yum} \
+  && rm -rf /var/lib/dnf/history.* \
+  && rm -rf /var/log/*
 
 RUN cat build-requirements.txt requirements.txt | sort > upper-constraints.txt \
   && pip3 install --no-cache-dir -r build-requirements.txt -c upper-constraints.txt \
