@@ -22,12 +22,23 @@ set -ex
 
 RELEASE=$(source /etc/os-release; echo $ID)
 
+# NOTE(pabelanger): Allow users to force either microdnf or dnf as a package
+# manager.
+PKGMGR="${PKGMGR:-}"
+if [ -z $PKGMGR ]; then
+    # Expect dnf to be installed, however if we find microdnf default to it.
+    PKGMGR=/usr/bin/dnf
+    if [ -f "/usr/bin/microdnf" ]; then
+        PKGMGR=/usr/bin/microdnf
+    fi
+fi
+
 mkdir -p /output/bindep
 mkdir -p /output/wheels
 
 cd /tmp/src
 
-dnf update -y
+$PKGMGR update -y
 
 function install_bindep {
     # Protect from the bindep builder image use of the assemble script
@@ -42,7 +53,7 @@ function install_bindep {
         fi
         compile_packages=$(bindep -b compile || true)
         if [ ! -z "$compile_packages" ] ; then
-            dnf install -y ${compile_packages}
+            $PKGMGR install -y ${compile_packages}
         fi
     fi
 }
@@ -138,7 +149,7 @@ for sibling in ${ZUUL_SIBLINGS:-}; do
     popd
 done
 
-dnf clean all
+$PKGMGR clean all
 rm -rf /var/cache/{dnf,yum}
 rm -rf /var/lib/dnf/history.*
 rm -rf /var/log/{dnf.*,hawkey.log}
