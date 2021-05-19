@@ -25,11 +25,19 @@ RELEASE=$(source /etc/os-release; echo $ID)
 # NOTE(pabelanger): Allow users to force either microdnf or dnf as a package
 # manager.
 PKGMGR="${PKGMGR:-}"
+PKGMGR_OPTS="${PKGMGR_OPTS:-}"
+
 if [ -z $PKGMGR ]; then
     # Expect dnf to be installed, however if we find microdnf default to it.
     PKGMGR=/usr/bin/dnf
     if [ -f "/usr/bin/microdnf" ]; then
         PKGMGR=/usr/bin/microdnf
+        if [ -z $PKGMGR_OPTS ]; then
+            # NOTE(pabelanger): skip install docs and weak dependencies to
+            # make smaller images. Sadly, setting these in dnf.conf don't
+            # appear to work.
+            PKGMGR_OPTS="--nodocs --setopt install_weak_deps=0"
+        fi
     fi
 fi
 
@@ -53,7 +61,7 @@ function install_bindep {
         fi
         compile_packages=$(bindep -b compile || true)
         if [ ! -z "$compile_packages" ] ; then
-            $PKGMGR install -y ${compile_packages}
+            $PKGMGR install -y $PKGMGR_OPTS ${compile_packages}
         fi
     fi
 }
