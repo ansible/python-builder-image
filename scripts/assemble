@@ -49,6 +49,14 @@ mkdir -p /tmp/src
 
 cd /tmp/src
 
+if [ -d /tmp/src/.zuul-repos.d ]; then
+    # Allow for projects to inject their own repo files, which is helpful if
+    # they have access to a local mirror.
+    pushd .zuul-repos.d
+    cp --backup --suffix=.bak *.repo /etc/yum.repos.d
+    popd
+fi
+
 $PKGMGR update -y
 
 function install_bindep {
@@ -161,6 +169,19 @@ for sibling in ${ZUUL_SIBLINGS:-}; do
 done
 
 $PKGMGR clean all
+
+if [ -d /tmp/src/.zuul-repos.d ]; then
+    # Restore existing yum.repos.d files
+    pushd .zuul-repos.d
+    for file in *.repo; do
+        rm -rf /etc/yum.repos.d/$file
+    done
+    popd
+    pushd /etc/yum.repos.d
+    find . -type f -name '*.bak' -exec sh -c ' mv {} $(basename {} .bak)' \;
+    popd
+fi
+
 rm -rf /var/cache/{dnf,yum}
 rm -rf /var/lib/dnf/history.*
 rm -rf /var/log/{dnf.*,hawkey.log}
