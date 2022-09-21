@@ -19,6 +19,8 @@ set -ex
 # manager.
 PKGMGR="${PKGMGR:-}"
 PKGMGR_OPTS="${PKGMGR_OPTS:-}"
+# Allow explicit override of pip options
+PIP_OPTS="${PIP_OPTS-}"
 
 if [ -z $PKGMGR ]; then
     # Expect dnf to be installed, however if we find microdnf default to it.
@@ -60,7 +62,7 @@ fi
 # to do things like pick up patched but unreleased versions
 # of dependencies.
 if [ -f /output/requirements.txt ] ; then
-    pip3 install $CONSTRAINTS --cache-dir=/output/wheels -r /output/requirements.txt
+    pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels -r /output/requirements.txt
 fi
 
 # Add any requested extras to the list of things to install
@@ -72,7 +74,7 @@ done
 if [ -f /output/packages.txt ] ; then
   # If a package list was passed to assemble, install that in the final
   # image.
-  pip3 install $CONSTRAINTS --cache-dir=/output/wheels -r /output/packages.txt $EXTRAS
+  pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels -r /output/packages.txt $EXTRAS
 else
   # Install the wheels. Uninstall any existing version as siblings maybe
   # be built with the same version number as the latest release, but we
@@ -80,11 +82,11 @@ else
   # automatic dependencies.
   # NOTE(pabelanger): It is possible a project may not have a wheel, but does have requirements.txt
   if [ $(ls -1 /output/wheels/*whl 2>/dev/null | wc -l) -gt 0 ]; then
-      pip3 uninstall -y /output/wheels/*.whl
-      pip3 install $CONSTRAINTS --cache-dir=/output/wheels /output/wheels/*.whl $EXTRAS
+      pip3 uninstall $PIP_OPTS -y /output/wheels/*.whl
+      pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels /output/wheels/*.whl $EXTRAS
   elif [ ! -z "$EXTRAS" ] ; then
-      pip3 uninstall -y $EXTRAS
-      pip3 install $CONSTRAINTS --cache-dir=/output/wheels $EXTRAS
+      pip3 uninstall $PIP_OPTS -y $EXTRAS
+      pip3 install $CONSTRAINTS $PIP_OPTS --cache-dir=/output/wheels $EXTRAS
   fi
 fi
 
