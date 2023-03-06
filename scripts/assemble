@@ -49,7 +49,14 @@ mkdir -p /tmp/src
 
 cd /tmp/src
 
-$PKGMGR update -y $PKGMGR_OPTS
+# run all, security or none for package update
+if [[ $PKG_UPDATE == 'all' ]]; then
+	$PKGMGR update -y $PKGMGR_OPTS
+elif [[ $PKG_UPDATE == 'security' ]]; then
+	$PKGMGR update -y $PKGMGR_OPTS --security
+elif [[ $PKG_UPDATE == 'none' ]]; then
+	echo "Skipping dnf update(s) as defined: ${PKG_UPDATE}"
+fi
 
 function install_bindep {
     # Protect from the bindep builder image use of the assemble script
