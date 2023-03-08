@@ -19,11 +19,17 @@ set -ex
 # manager.
 PKGMGR="${PKGMGR:-}"
 PKGMGR_OPTS="${PKGMGR_OPTS:-}"
+PKGMGR_UPDATE="${PKGMGR_UPDATE:-}"
 
+# Install dnf because we need it for security patches only when defined
+if [[ $PKGMGR_UPDATE == 'security' && -f "/usr/bin/microdnf" ]]; then
+    /usr/bin/microdnf install dnf -y $PKGMGR_OPTS
+fi
 if [ -z $PKGMGR ]; then
     # Expect dnf to be installed, however if we find microdnf default to it.
-    PKGMGR=/usr/bin/dnf
-    if [ -f "/usr/bin/microdnf" ]; then
+    if [[ $PKGMGR_UPDATE == 'security' && -f "/usr/bin/dnf" ]]; then
+        PKGMGR=/usr/bin/dnf
+    elif [[ $PKGMGR_UPDATE != 'security' && -f "/usr/bin/microdnf" ]]; then
         PKGMGR=/usr/bin/microdnf
         if [ -z "${PKGMGR_OPTS}" ]; then
             # NOTE(pabelanger): skip install docs and weak dependencies to
@@ -34,7 +40,14 @@ if [ -z $PKGMGR ]; then
     fi
 fi
 
-$PKGMGR update -y $PKGMGR_OPTS
+# run all, security or none for package update
+if [ $PKGMGR_UPDATE == 'all' ]; then
+	$PKGMGR update -y $PKGMGR_OPTS
+elif [ $PKGMGR_UPDATE == 'security' ]; then
+	$PKGMGR update -y $PKGMGR_OPTS --security
+elif [ $PKGMGR_UPDATE == 'none' ]; then
+	echo "Skipping dnf update(s) as defined: ${PKGMGR_UPDATE}"
+fi
 
 if [ -f /output/bindep/run.txt ] ; then
     PACKAGES=$(cat /output/bindep/run.txt)
